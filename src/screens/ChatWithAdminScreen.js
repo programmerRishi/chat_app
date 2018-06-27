@@ -5,9 +5,11 @@ import {
    FlatList,
    Dimensions,
    Image,
+   Keyboard,
    TouchableOpacity,
    Alert,
    ActivityIndicator,
+   LayoutAnimation,
    ProgressBarAndroid } from 'react-native';
 import { connect } from 'react-redux';
 import { FormInput, Card, Icon } from 'react-native-elements';
@@ -19,7 +21,11 @@ const { width, height } = Dimensions.get('window');
 class ChatWithAdminScreen extends Component {
   static navigationOptions = ChatScreenNavigationOptions;
 
+  state = { addPaddingBottom: 0 };
+
   componentWillMount() {
+    Keyboard.addListener('keyboardDidShow', this.keyboardDidShow);
+    Keyboard.addListener('keyboardDidHide', this.keyboardDidHide);
     this.props.navigation.setParams(
       {
         signOut: this.props.signOut
@@ -34,6 +40,13 @@ class ChatWithAdminScreen extends Component {
       if (shouldCallGetFinalMessages) {
         getFinalMessageHistory({ oldMessagesHistory, deletedMessagesHistory });
       }
+      LayoutAnimation.configureNext(
+        {
+          duration: 150,
+          create: { type: 'linear', property: 'opacity' },
+          update: { type: 'linear' }
+        }
+      );
       return true;
     }
     return false;
@@ -46,53 +59,25 @@ class ChatWithAdminScreen extends Component {
       `Do you want to delete this ${item.type}`,
       [
         { text: 'OK',
-          onPress: () => {
-            if (item.type === 'image') {
-              deletePhoto(item);
-              return;
-            }
-            deleteMessage(item);
-          }
+          onPress: () => item.type === 'image' ? deletePhoto(item) : deleteMessage(item)
         },
         { text: 'Cancel', onPress: () => console.log('cancel'), style: 'cancel' },
       ],
       { cancelable: true }
     );
   }
+  //
+  keyboardDidShow = (e) => {
+    console.log('keyboardDidShow', e.endCoordinates);
+    this.props.onKeyboardShow((e.endCoordinates.height));
+  }
+
+  keyboardDidHide = () => {
+    console.log('keyboardDidHide');
+    this.props.onKeyBoardHide();
+  }
 
   keyExtractor = item => item.timeStamp;
-
-  renderMessages = ({ item }) => {
-    const { adminMessagesBubbleStyle, userMessagesBubbleStyle, messagesBubbleStyle, imageContainerStyle, imageBubbleStyle } = Styles;
-    const customMessageBubbleStyle = item.sender === 'user' ? userMessagesBubbleStyle : adminMessagesBubbleStyle;
-    if (item.type === 'image') {
-      return (
-        <TouchableOpacity
-          onLongPress={() => this.onLongPress(item)}
-          delayLongPress={500}
-        >
-          <View style={imageContainerStyle}>
-            <Image
-              source={{ uri: item.photo }}
-              style={imageBubbleStyle}
-            />
-          </View>
-        </TouchableOpacity>
-      );
-    }
-    return (
-      <TouchableOpacity
-        onLongPress={() => this.onLongPress(item)}
-        delayLongPress={500}
-      >
-        <Card
-          containerStyle={[messagesBubbleStyle, customMessageBubbleStyle]}
-        >
-          <Text >{item.message}</Text>
-        </Card>
-      </TouchableOpacity>
-    );
-  }
 
   whileFetchingData = (messagesHistory) => {
     if (messagesHistory === null) {
@@ -115,8 +100,55 @@ class ChatWithAdminScreen extends Component {
     );
   }
 
+  showProgressBar = (item) => {
+    const { progress, uploadingImageUri } = this.props;
+    const showProgressBar = item.photo === uploadingImageUri && progress === 0;
+    return (
+      <ProgressBarAndroid
+        animating={showProgressBar}
+        indeterminate
+        styleAttr='Horizontal'
+        color='#000'
+      />
+    );
+  }
+    renderMessages = ({ item }) => {
+      const { adminMessagesBubbleStyle, userMessagesBubbleStyle, messagesBubbleStyle, imageContainerStyle, imageBubbleStyle } = Styles;
+      const customMessageBubbleStyle = item.sender === 'user' ? userMessagesBubbleStyle : adminMessagesBubbleStyle;
+      if (item.type === 'image') {
+        return (
+          <TouchableOpacity
+            onLongPress={() => this.onLongPress(item)}
+            delayLongPress={500}
+          >
+            <View style={imageContainerStyle}>
+              <Image
+                source={{ uri: item.photo }}
+                style={imageBubbleStyle}
+              />
+              {this.showProgressBar(item)}
+            </View>
+          </TouchableOpacity>
+        );
+      }
+      return (
+        <TouchableOpacity
+          onLongPress={() => this.onLongPress(item)}
+          delayLongPress={500}
+        >
+          <Card
+            containerStyle={[messagesBubbleStyle, customMessageBubbleStyle]}
+          >
+            <Text >{item.message}</Text>
+          </Card>
+        </TouchableOpacity>
+      );
+    }
+
   render() {
+    console.log(this.state);
     const {
+      addPaddingBottom,
       showModal,
       uri,
       showImagePicker,
@@ -150,9 +182,8 @@ class ChatWithAdminScreen extends Component {
         />
       );
     }
-
     return (
-      <View style={container}>
+      <View style={[container, { paddingBottom: addPaddingBottom }]}>
           <View style={messagesContainerStyle}>
             {this.whileFetchingData(messagesHistory)}
           </View>
@@ -185,14 +216,15 @@ class ChatWithAdminScreen extends Component {
               />
           </View>
       </View>
-          );
-        }
-      }
+    );
+  }
+}
 
-const mapStateToProps = ({ cameraRoll, chat }) => {
-  const { uri, base64, showModal } = cameraRoll;
+const mapStateToProps = ({ cameraRoll, chat, keyboardAvoid }) => {
+  const { uri, base64, showModal, progress, uploadingImageUri } = cameraRoll;
   const { userMessage, messagesHistory, oldMessagesHistory, deletedMessagesHistory, showActivityIndicator } = chat;
-  return { uri, base64, showModal, userMessage, oldMessagesHistory, messagesHistory, deletedMessagesHistory, showActivityIndicator };
+  const { addPaddingBottom } = keyboardAvoid;
+  return { uri, base64, showModal, progress, uploadingImageUri, userMessage, oldMessagesHistory, messagesHistory, deletedMessagesHistory, showActivityIndicator, addPaddingBottom };
 };
 
 export default connect(mapStateToProps, actions)(ChatWithAdminScreen);

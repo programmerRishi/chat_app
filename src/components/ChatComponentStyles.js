@@ -8,10 +8,11 @@ export const Styles = {
     backgroundColor: '#DEDEDE',
     borderWidth: 2,
     borderColor: '#000',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   footerStyle: {
     flex: 1,
+    paddingBottom: 10,
     borderRadius: 40,
     flexDirection: 'row',
     justifyContent: 'flex-start',

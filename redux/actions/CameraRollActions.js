@@ -1,10 +1,10 @@
 import { ImagePicker } from 'expo';
 import firebase from 'firebase';
-import _ from 'lodash';
 import {
   SHOW_IMAGE_PICKER,
   SEND_PHOTO_URI,
-  CANCEL_PHOTO_SENDING } from './types';
+  CANCEL_PHOTO_SENDING,
+  PROGRESS } from './types';
 
 export const showImagePicker = () => {
   return async (dispatch) => {
@@ -33,7 +33,7 @@ export const sendPhotoUri = (uri) => {
   };
 };
 
-export const uploadPhoto = (base64CodedImage) => {
+export const uploadPhoto = (base64CodedImage, uploadingImageUri) => {
   return async (dispatch) => {
     const date = new Date().toISOString();
     const imageName = `CHAT${date}`.substr(0, 23);
@@ -42,9 +42,8 @@ export const uploadPhoto = (base64CodedImage) => {
     const uploadTask = storageRef.putString(base64CodedImage, 'base64');
     uploadTask.on('state_changed',
       snapshot => {
-        console.log(snapshot);
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes);
-        console.log(progress);
+        dispatch({ type: PROGRESS, payload: { progress, uploadingImageUri } });
       }
     );
   };
@@ -55,18 +54,10 @@ export const cancelPhotoSending = () => {
   return ({ type: CANCEL_PHOTO_SENDING });
 };
 
-export const deletePhoto = ({ oldMessagesHistory, item }) => {
+export const deletePhoto = (item) => {
   return async () => {
-    _.forEach(
-        oldMessagesHistory,
-        (value) => {
-            if (value === item) {
-               const deletedElement = value;
-               const { uid } = firebase.auth().currentUser;
-               const databaseRef = firebase.database().ref(`/deletedMessages/${uid}/${item.timeStamp}`);
-               databaseRef.update(deletedElement);
-            }
-        }
-      );
+  const { uid } = firebase.auth().currentUser;
+  const databaseRef = firebase.database().ref(`/deletedMessages/${uid}/${item.timeStamp}`);
+  databaseRef.update(item);
   };
 };

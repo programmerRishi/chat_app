@@ -36,7 +36,7 @@ const SelectedPhotoModal = ({ uri, base64, showModal, sendPhotoUri, uploadPhoto,
               onPress={
                 () => {
                   sendPhotoUri(uri);
-                  uploadPhoto(base64);
+                  uploadPhoto(base64, uri);
                 }
               }
               raised

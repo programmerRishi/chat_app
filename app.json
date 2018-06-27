@@ -8,7 +8,10 @@
     "platforms": ["ios", "android"],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/app-icon.png",
+    "android": {
+      "package": "com.programmerRishi.chat-app"
+    },
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",

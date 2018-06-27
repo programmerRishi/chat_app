@@ -16,15 +16,15 @@ const CustomModal = (props) => {
         animationType='fade'
         onRequestClose={() => {}}// it is must for android app
         >
-          <View style={[modalViewStyle, { alignItems: 'flex-end' }]}>
-            <Text style={modalTextStyle}>{props.modalMessage}</Text>
-          </View>
-          <View style={modalViewStyle}>
-            <ActivityIndicator
-            color='#000'
-            size={spinnerSize}
-            />
-          </View>
+            <View style={[modalViewStyle, { alignItems: 'flex-end' }]}>
+              <Text style={modalTextStyle}>{props.modalMessage}</Text>
+            </View>
+            <View style={modalViewStyle}>
+              <ActivityIndicator
+              color='#000'
+              size={spinnerSize}
+              />
+            </View>
         </Modal>
     );
 };

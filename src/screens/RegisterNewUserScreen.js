@@ -73,16 +73,17 @@ class RegisterNewUserScreen extends Component {
     }
 
     showError = () => {
-      if (this.props.error.length >= 13) {
+      const { error, resetFields } = this.props;
+      if (error.length >= 13) {
         // this code below in the if section is for the error to animated in and out of the screen
         setTimeout(() => this.setState({ top: -30 }), 1000);
-        setTimeout(() => { this.props.resetFields(); this.setState({ top: 15 }); }, 1200);
+        setTimeout(() => { resetFields(); this.setState({ top: 15 }); }, 1200);
         return (
           <FormValidationMessage
             labelStyle={{ fontFamily: 'KalamRegular', fontSize: 18, textAlign: 'center' }}
             containerStyle={{ position: 'absolute', top: this.state.top, elevation: 5 }}
           >
-          {this.props.error}
+          {error}
           </FormValidationMessage>
         );
       }
@@ -92,12 +93,13 @@ class RegisterNewUserScreen extends Component {
           labelStyle={{ fontFamily: 'KalamRegular', fontSize: 18, textAlign: 'center' }}
           containerStyle={{ position: 'absolute', top: -30, elevation: 5 }}
         >
-        {this.props.error}
+        {error}
         </FormValidationMessage>
       );
     }
 
     render() {
+      const { signupUpdate, email, password } = this.props;
       const { viewContainerStyle, cardContainerStyle, wrapperStyle, labelStyle } = styles;
       return (
           <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -123,9 +125,9 @@ class RegisterNewUserScreen extends Component {
                     containerStyle={{ width: 300 }}
                     inputStyle={styles.inputStyle}
                     autoFocus
-                    onChangeText={(text) => this.props.signupUpdate({ prop: 'email', value: text })}
-                    onSubmitEditing={() => this.password.focus()}
-                    value={this.props.email}
+                    onChangeText={(text) => signupUpdate({ prop: 'email', value: text })}
+                    onSubmitEditing={() => this.passwordField.focus()}
+                    value={email}
                   />
                   <FormLabel labelStyle={labelStyle}>
                       Password
@@ -134,9 +136,9 @@ class RegisterNewUserScreen extends Component {
                     containerStyle={{ width: 270 }}
                     inputStyle={styles.inputStyle}
                     secureTextEntry={this.state.hidePassword}
-                    ref={(password) => (this.password = password)}
-                    onChangeText={(text) => this.props.signupUpdate({ prop: 'password', value: text })}
-                    value={this.props.password}
+                    ref={(passwordField) => (this.passwordField = passwordField)}
+                    onChangeText={(text) => signupUpdate({ prop: 'password', value: text })}
+                    value={password}
                   />
                   {this.onLoading()}
               </Card>

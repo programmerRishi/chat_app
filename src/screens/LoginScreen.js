@@ -31,13 +31,13 @@
     state = { eyeIconName: 'eye', hidePassword: true, top: 15, toCheckLogin: true };
 
     componentWillMount() {
-
+      const { getDeletedMessageHistory, getMessageHistory, navigation } = this.props;
       firebase.auth().onAuthStateChanged(
         user => {
           if (user) {
-            this.props.getDeletedMessageHistory();
-            this.props.getMessageHistory();
-            this.props.navigation.navigate('chat');
+            getDeletedMessageHistory();
+            getMessageHistory();
+            navigation.navigate('chat');
           } else this.setState({ toCheckLogin: false });
         }
       );
@@ -83,16 +83,17 @@
     }
 
     showError = () => {
-      if (this.props.error.length >= 13) {
+      const { error, resetLogin } = this.props;
+      if (error.length >= 13) {
         // this code below in the if section is for the error to animated in and out of the screen
         setTimeout(() => this.setState({ top: -30 }), 1000);
-        setTimeout(() => { this.props.resetLogin(); this.setState({ top: 15 }); }, 1200);
+        setTimeout(() => { resetLogin(); this.setState({ top: 15 }); }, 1200);
         return (
           <FormValidationMessage
             labelStyle={{ fontFamily: 'KalamRegular', fontSize: 18, textAlign: 'center' }}
             containerStyle={{ position: 'absolute', top: this.state.top, elevation: 5 }}
           >
-          {this.props.error}
+          {error}
           </FormValidationMessage>
         );
       }
@@ -102,7 +103,7 @@
           labelStyle={{ fontFamily: 'KalamRegular', fontSize: 18, textAlign: 'center' }}
           containerStyle={{ position: 'absolute', top: -30, elevation: 5 }}
         >
-        {this.props.error}
+        {error}
         </FormValidationMessage>
       );
     }
@@ -110,6 +111,7 @@
     render() {
       const { width } = Dimensions.get('window');
       const { viewContainerStyle, cardContainerStyle, wrapperStyle, labelStyle } = styles;
+      const { loginUpdate, email, password, navigation } = this.props;
       if (this.state.toCheckLogin) {
         return (
             <CustomModal
@@ -143,9 +145,9 @@
                     containerStyle={{ width: 300 }}
                     inputStyle={styles.inputStyle}
                     autoFocus
-                    onChangeText={(text) => this.props.loginUpdate({ prop: 'email', value: text })}
-                    onSubmitEditing={() => this.password.focus()}
-                    value={this.props.email}
+                    onChangeText={(text) => loginUpdate({ prop: 'email', value: text })}
+                    onSubmitEditing={() => this.passwordField.focus()}
+                    value={email}
                   />
                   <FormLabel labelStyle={labelStyle}>
                       Password
@@ -154,9 +156,9 @@
                     containerStyle={{ width: 270 }}
                     inputStyle={styles.inputStyle}
                     secureTextEntry={this.state.hidePassword}
-                    ref={(password) => (this.password = password)}
-                    onChangeText={(text) => this.props.loginUpdate({ prop: 'password', value: text })}
-                    value={this.props.password}
+                    ref={(passwordField) => (this.passwordField = passwordField)}
+                    onChangeText={(text) => loginUpdate({ prop: 'password', value: text })}
+                    value={password}
                   />
                   {this.onLoading()}
                   <View style={styles.signUpButtonAndTextContainerStyles}>
@@ -166,7 +168,7 @@
                         title='SignUp'
                         fontFamily='KalamRegular'
                         backgroundColor='#242424'
-                        onPress={() => this.props.navigation.navigate('register')}
+                        onPress={() => navigation.navigate('register')}
                         rounded
                       />
                   </View>

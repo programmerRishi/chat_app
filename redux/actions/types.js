@@ -21,3 +21,6 @@ export const SEND_MESSAGE = 'send_message';
 export const DELETED_MESSAGES_LOADED = 'deleted_message_loaded';
 export const DELETED_MESSAGES_LOADING_FAILED = 'deleted_message_loading_failed';
 export const FINAL_MESSAGES = 'final_messages';
+export const PROGRESS = 'progress';
+export const KEYBOARD_DID_SHOW = 'keyboard_did_show';
+export const KEYBOARD_DID_HIDE = 'keyboard_did_hide';
