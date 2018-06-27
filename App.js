@@ -5,7 +5,7 @@ import firebase from 'firebase';
 import ReduxThunk from 'redux-thunk';
 import { createStore, applyMiddleware } from 'redux';
 import reducers from './redux/reducers';
-import Router from './src/components/Router';
+import { Router } from './src/components';
 import firebaseConfig from './firebaseConfig';
 
 console.disableYellowBox = true;

@@ -31,10 +31,14 @@
     state = { eyeIconName: 'eye', hidePassword: true, top: 15, toCheckLogin: true };
 
     componentWillMount() {
+
       firebase.auth().onAuthStateChanged(
         user => {
-          if (user) this.props.navigation.navigate('chat');
-          else this.setState({ toCheckLogin: false });
+          if (user) {
+            this.props.getDeletedMessageHistory();
+            this.props.getMessageHistory();
+            this.props.navigation.navigate('chat');
+          } else this.setState({ toCheckLogin: false });
         }
       );
     }

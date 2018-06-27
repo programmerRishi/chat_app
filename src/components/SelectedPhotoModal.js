@@ -8,7 +8,7 @@ import { Icon } from 'react-native-elements';
 
 const { width, height } = Dimensions.get('window');
 
-const SelectedPhotoModal = ({ uri, showModal, onSendIconPress, onBackIconPress }) => {
+const SelectedPhotoModal = ({ uri, base64, showModal, sendPhotoUri, uploadPhoto, onBackIconPress }) => {
     // both the icon tags should be place after image tag otherwise the touch on icon won't work
     return (
         <Modal
@@ -33,7 +33,12 @@ const SelectedPhotoModal = ({ uri, showModal, onSendIconPress, onBackIconPress }
               type='font-awesome'
               size={30}
               containerStyle={styles.sendIconContainerStyle}
-              onPress={onSendIconPress(uri)}
+              onPress={
+                () => {
+                  sendPhotoUri(uri);
+                  uploadPhoto(base64);
+                }
+              }
               raised
             />
           </View>

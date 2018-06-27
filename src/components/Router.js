@@ -36,4 +36,4 @@ const Router = createSwitchNavigator(
   }
 );
 
-export default Router;
+export { Router };
